@@ -27,20 +27,14 @@ public class leaf {
 	
 	private boolean right;		//is leaf leaning right?
 	private boolean wide;		//is leaf oriented horizontally?
-	private boolean inverted;	//is leaf upside down (petiole above blade)?
+//	private boolean inverted;	//is leaf upside down (petiole above blade)?
 	
 	private double[] topLine;	//x1, y1, x2, y2, of line intersecting petiole top
 	private double[] bottomLine;	//x1, y1, x2, y2, of line intersecting petiole bottom
 		//but note bottom should be equivalent to the border of the ROI
 		//(which border depends on orientation)
-	private double topX, topY, bottomX, bottomY; 
-		//calculated top and bottom points of petiole
 						
-	private double petioleLength;		//length of petiole
-	
-	private double bladeLength;
-	private double bladeWidth;
-	private double bladeArea;
+
 	
 	private float[] leafCenter_x;
 	private	float[] leafCenter_y;
@@ -288,6 +282,7 @@ public class leaf {
 		if (verbose > 0) IJ.log("end findPetiole");
 	}// findPetiole(ImageProcessor ip)
 	
+	@SuppressWarnings("unused")
 	private void printArray(float[] testArray, String title) {
 		IJ.log("----------------");
 		IJ.log("array " + title);
@@ -365,7 +360,7 @@ public void addPetioleToManager(ImagePlus imp, ImageProcessor ip, RoiManager rm,
 	if (verbose > 0) IJ.log("end addToManager");
 }
 
-private int[] addArray(int[] a, int[]b) {
+/*private int[] addArray(int[] a, int[]b) {
 	if (verbose > 2) IJ.log("start addArray");
 	int[]c = new int[a.length];
 	for(int i = 0; i < a.length;i++) {
@@ -373,7 +368,7 @@ private int[] addArray(int[] a, int[]b) {
 	}
 	if (verbose > 2) IJ.log("end addArray");
 	return c;
-}
+}*/
 	
 
 		
