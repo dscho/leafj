@@ -1,9 +1,6 @@
 import ij.*;
 import ij.process.*;
-import ij.gui.*;
-import java.awt.*;
 import java.util.Arrays;
-import ij.plugin.filter.*;
 
 public class pixelRowLeaf {
  	private double[] pixels;				//a row of pixels

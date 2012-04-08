@@ -8,13 +8,11 @@ import ij.plugin.filter.*;
 import ij.measure.*;
 import ij.process.*;
 import ij.gui.*;
-import java.lang.*;
 import java.awt.*;
 
 public class LeafResults {
 	private TextPanel tp;
 	private TextWindow tw;
-	private int maxLeaves = 13;
 	private int verbose = 1;
 	
 	LeafResults(String title) {

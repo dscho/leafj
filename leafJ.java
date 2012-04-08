@@ -14,11 +14,10 @@
 import ij.*;
 import ij.process.*;
 import ij.gui.*;
-import java.awt.*;
 import ij.plugin.filter.*;
 import ij.measure.*;
 import ij.plugin.frame.*;
-import ij.text.*;
+
 import java.util.Arrays;
 import java.util.Comparator;
 
@@ -36,11 +35,7 @@ public class leafJ implements PlugInFilter {
 	}
 
 	public void run(ImageProcessor ip) {
-		Rectangle r = ip.getRoi();
-		int width = r.width;			// ROI width
-		int height = r.height;			// ROI height
-		int y = r.y;				// ROI y 
-		int x =r.x;				// ROI x
+
 		double minThreshold = ip.getMinThreshold();
 		double maxThreshold = ip.getMaxThreshold();
 		sampleDescription sd = new sampleDescription();
@@ -60,7 +55,7 @@ public class leafJ implements PlugInFilter {
 		tip.setThreshold(minThreshold,maxThreshold,ImageProcessor.NO_LUT_UPDATE);
 		ResultsTable rt = new ResultsTable();
 		RoiManager rm = new RoiManager();
-		rm = rm.getInstance();
+		rm = RoiManager.getInstance();
 		if (rm.getList().getItemCount()>0) {
 			//if a ROI window is already open, this is necessary
 			rm.runCommand("Select All");

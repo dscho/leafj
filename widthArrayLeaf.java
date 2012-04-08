@@ -2,10 +2,7 @@ import java.lang.Math;
 import java.util.Arrays;
 
 import ij.*;
-import ij.process.*;
-import ij.gui.*;
-import java.awt.*;
-import ij.plugin.filter.*;
+
 
 //remove IJ imports after debug
 
