@@ -7,11 +7,8 @@
 import ij.*;
 import ij.process.*;
 import ij.gui.*;
-import java.awt.*;
-import ij.plugin.filter.*;
 import ij.measure.*;
 import ij.plugin.frame.*;
-import java.util.*;
 
 
 public class leaf {
