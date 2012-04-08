@@ -24,7 +24,7 @@ import java.util.Comparator;
 
 
 
-public class leafJ implements PlugInFilter {
+public class LeafJ_ implements PlugInFilter {
 	ImagePlus imp;
 	public int verbose = 0;
 	
