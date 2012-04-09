@@ -17,9 +17,10 @@ import java.awt.event.WindowListener;
 
 
 public class practiceTable{
-	JPanel buttonPanel = new JPanel();
-	JTable table = new JTable(5,5);
-	boolean closed = false;
+	private JFrame frame = new JFrame("PracticeTable");
+	private JPanel buttonPanel = new JPanel();
+	private JTable table = new JTable(5,5);
+	private Object lock = new Object();
 
 
 	public practiceTable() {
@@ -53,31 +54,32 @@ public class practiceTable{
 
 	final Runnable doPanel = new Runnable() {
 		public void run() {
-			System.out.println("start of do panel");
+			System.out.println("start of doPanel");
 			JScrollPane scrollPane = new JScrollPane(table);
-			JPanel buttonPanel = makeButtonPanel();
-			JFrame frame = new JFrame("PracticeTable");
-			frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 			scrollPane.setOpaque(true);
+			JPanel buttonPanel = makeButtonPanel();
+			frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 			frame.add(scrollPane,BorderLayout.WEST);
 			frame.add(buttonPanel,BorderLayout.EAST);
 			frame.pack();
 			frame.setVisible(true);	
 			frame.addWindowListener(new windowClosedListener());
-			System.out.println("end of do panel");
+			System.out.println("end of doPanel");
 		}
 	};
 	
 	Thread tableThread = new Thread() {
 		public void run() {
 			System.out.println("start of table Thread");
-			try {
-				java.awt.EventQueue.invokeAndWait(doPanel);
+			synchronized(lock) {
+				while (frame.isVisible())
+					try {
+						lock.wait();			
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				System.out.println("end of tableThread");
 			}
-			catch (Exception e) {
-				e.printStackTrace();
-			}
-			System.out.println("end of tableThread");
 		}
 	};
 
@@ -91,7 +93,6 @@ public class practiceTable{
 	
 	class windowClosedListener implements WindowListener {
 		public void windowClosed(WindowEvent event) {
-			closed = true;
 			System.out.println("window closed");
 		}
 
