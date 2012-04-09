@@ -13,7 +13,10 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowListener;
+
+
 
 
 public class practiceTable{
@@ -52,8 +55,9 @@ public class practiceTable{
 		return(buttonPanel);
 	}
 
-	final Runnable doPanel = new Runnable() {
-		public void run() {
+//	final Runnable doPanel = new Runnable() {
+//		public void run() {
+	public void doPanel() {
 			System.out.println("start of doPanel");
 			JScrollPane scrollPane = new JScrollPane(table);
 			scrollPane.setOpaque(true);
@@ -63,10 +67,18 @@ public class practiceTable{
 			frame.add(buttonPanel,BorderLayout.EAST);
 			frame.pack();
 			frame.setVisible(true);	
-			frame.addWindowListener(new windowClosedListener());
+			frame.addWindowListener(new WindowAdapter() {
+				@Override
+				public void windowClosing(WindowEvent arg0) {
+					synchronized(lock) {
+						frame.setVisible(false);
+						lock.notify();
+					}
+				}
+			});
 			System.out.println("end of doPanel");
 		}
-	};
+//	};
 	
 	Thread tableThread = new Thread() {
 		public void run() {
@@ -86,34 +98,9 @@ public class practiceTable{
 
 	public static void main(String[] args){
 		practiceTable pt = new practiceTable();
+		pt.doPanel();
 		pt.tableThread.start();
 		System.out.println("end of main");
-
-	}
-	
-	class windowClosedListener implements WindowListener {
-		public void windowClosed(WindowEvent event) {
-			System.out.println("window closed");
-		}
-
-		public void windowActivated(WindowEvent arg0) {
-		}
-
-		public void windowClosing(WindowEvent arg0) {			
-		}
-
-		public void windowDeactivated(WindowEvent arg0) {			
-		}
-
-		public void windowDeiconified(WindowEvent arg0) {
-		}
-
-		public void windowIconified(WindowEvent arg0) {	
-		}
-
-		public void windowOpened(WindowEvent arg0) {			
-		}
-		
 	}
 
 	class addRowListener implements ActionListener {
@@ -137,6 +124,7 @@ public class practiceTable{
 	class cancelListener implements ActionListener {
 		public void actionPerformed(ActionEvent event) {
 			System.out.println("Cancel listener");
+			frame.dispose();
 		}
 	}
 
