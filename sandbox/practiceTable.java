@@ -21,14 +21,10 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowListener;
 import java.util.Vector;
 
-
-
-
 public class practiceTable{
 	private JFrame frame = new JFrame("PracticeTable");
 	private JPanel buttonPanel = new JPanel();
 	private JTable table = new JTable(5,5);
-	private Object lock = new Object();
 
 
 	public practiceTable() {
@@ -83,36 +79,17 @@ public class practiceTable{
 			frame.addWindowListener(new WindowAdapter() {
 				@Override
 				public void windowClosing(WindowEvent arg0) {
-					synchronized(lock) {
 						frame.setVisible(false);
-						lock.notify();
-					}
 				}
 			});
 			System.out.println("end of doPanel");
 		}
 //	};
 	
-	Thread tableThread = new Thread() {
-		public void run() {
-			System.out.println("start of table Thread");
-			synchronized(lock) {
-				while (frame.isVisible())
-					try {
-						lock.wait();			
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				System.out.println("end of tableThread");
-			}
-		}
-	};
-
 
 	public static void main(String[] args){
 		practiceTable pt = new practiceTable();
 		pt.doPanel();
-		pt.tableThread.start();
 		System.out.println("end of main");
 	}
 
