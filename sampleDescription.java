@@ -3,10 +3,25 @@
 //Julin Maloof
 //Nov 3,2011
 
+//April 6, 2011
+//Working to make user customizable input
+
 
 import ij.*;
 import ij.gui.*;
 import java.io.*;
+
+//check for configuration file
+//if no configuration file, present a generic table
+//if there is a configuration file, load it.
+//ask if these defaults should be modified
+//show editable table to modify
+//save table
+
+//phase 1: create and display a generic table
+//phase 2: convert that table into the current dialog display
+//I think this should be its own class.  The current class is for the actual sample descripton
+//the other class can be for the table
 
 //this thing should be rewritten with some kind of hash or equivalent.
 
