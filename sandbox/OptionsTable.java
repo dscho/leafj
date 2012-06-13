@@ -6,29 +6,36 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.BoxLayout;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
-import sandbox.practiceTable.addColListener;
-import sandbox.practiceTable.addRowListener;
-import sandbox.practiceTable.cancelListener;
-import sandbox.practiceTable.doneListener;
-
 public class OptionsTable {
 
-	/**
-	 * @param args
-	 */
+	JFrame frame;
+	JTable table;
+	JPanel buttonPanel;
+	ArrayList<ArrayList <String>> data = new ArrayList<ArrayList<String>>();
+	ArrayList<String> colNames = new ArrayList<String>();
+	int rows = 0; //initial number of rows
+	
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run () {
@@ -37,14 +44,51 @@ public class OptionsTable {
 		});
 	}
 	
-	JFrame frame;
-	JTable table;
-	JPanel buttonPanel;
-	
+	private void getInitialValues() {
+		File file = new File("leafJ_defaults.txt");
+		try {
+			BufferedReader input = new BufferedReader(new FileReader(file));
+			
+			String header = input.readLine();
+			colNames.addAll(Arrays.asList(header.split("\t")));
+			
+			while (true) { 
+				String line = input.readLine();
+				if (line == null) break;
+				if (line.trim().length() == 0) continue;
+				ArrayList<String> fields = new ArrayList<String>(Arrays.asList(line.split("\t")));
+				data.add(fields);	
+				rows++;
+			}
+			input.close();
+			
+		} catch (IOException e) {
+			System.out.println("Can't open defaults files; generating from scratch");
+			colNames.addAll(Arrays.asList(new String[] {
+					"set", "treatment","replicate","genotype"
+			}));
+			data.add(new ArrayList<String>(Arrays.asList(new String[]{// "set"
+					"A","B","C","D"
+					})));
+			data.add(new ArrayList<String>(Arrays.asList(new String[]{// "treatment"
+					"control","treated"
+					})));
+			data.add(new ArrayList<String>(Arrays.asList(new String[]{// "replicate"
+					"1","2","3","4"
+					})));
+			data.add(new ArrayList<String>(Arrays.asList(new String[]{// "genotype"
+					"Col","Ler","Ws","Cvi"
+					})));		
+			rows=4;
+		}
+		
+	}
+
 	public OptionsTable() {
 		frame = new JFrame("Options");
 		table = new JTable(5,5);
-		setTable(table);
+		getInitialValues();
+		setTable();
 		buttonPanel = new JPanel();
 		setButtons(buttonPanel);
 		JScrollPane scrollPane = new JScrollPane(table);
@@ -62,10 +106,11 @@ public class OptionsTable {
 		});
 	}
 	
-	public void setTable(JTable t) {
-		t.setShowHorizontalLines(true);
-		t.setShowVerticalLines(true);
-		t.setGridColor(Color.BLACK);
+	private void setTable() {
+		table = new JTable(rows,data.size());
+		table.setShowHorizontalLines(true);
+		table.setShowVerticalLines(true);
+		table.setGridColor(Color.BLACK);
 	}
 	
 	public void setButtons(JPanel bp) {
@@ -82,9 +127,8 @@ public class OptionsTable {
 		
 		
 		JTextArea info = new JTextArea("Each column represents one type of annotation.\n\n" + 
-										"Place the name for the data type in the first row.\n" +
 										"If you want to have a pull-down list of allowable data\n" +
-										"then place allowable values in subsequent rows\n" +
+										"then place allowable values in the rows\n" +
 										"otherwise leave blank and a text entry field will be presented\n");
 		info.setEditable(false);
 		bp.add(info);
@@ -104,13 +148,25 @@ public class OptionsTable {
 
 	class addColListener implements ActionListener {
 		public void actionPerformed(ActionEvent event) {
+			final String colName;
 			System.out.println("col listener");
-			TableColumn tc = new TableColumn();
-			tc.setHeaderValue("new column");
-			table.addColumn(tc);
+			final TableColumn tc = new TableColumn();
+			final JFrame getColumn = new JFrame("Enter column name");
+			final JTextField colNameField = new JTextField(25);
+			colNameField.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent event) {
+					tc.setHeaderValue(colNameField.getText());
+					getColumn.dispose();
+					table.addColumn(tc);
+				}
+			});
+			getColumn.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			getColumn.getContentPane().add(colNameField);
+			getColumn.pack();
+			getColumn.setVisible(true);
 		}
 	}
-	
+		
 	class doneListener implements ActionListener {
 		public void actionPerformed(ActionEvent event) {
 			System.out.println("Done listener");
