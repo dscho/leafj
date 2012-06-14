@@ -12,6 +12,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Vector;
 
 import javax.swing.JButton;
@@ -24,6 +25,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.BoxLayout;
+import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
@@ -35,7 +37,7 @@ public class OptionsTable {
 	ArrayList<ArrayList <String>> data = new ArrayList<ArrayList<String>>();
 	ArrayList<String> colNames = new ArrayList<String>();
 	int rows = 0; //initial number of rows
-	
+
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run () {
@@ -43,15 +45,15 @@ public class OptionsTable {
 			}
 		});
 	}
-	
+
 	private void getInitialValues() {
 		File file = new File("leafJ_defaults.txt");
 		try {
 			BufferedReader input = new BufferedReader(new FileReader(file));
-			
+
 			String header = input.readLine();
 			colNames.addAll(Arrays.asList(header.split("\t")));
-			
+
 			while (true) { 
 				String line = input.readLine();
 				if (line == null) break;
@@ -61,7 +63,7 @@ public class OptionsTable {
 				rows++;
 			}
 			input.close();
-			
+
 		} catch (IOException e) {
 			System.out.println("Can't open defaults files; generating from scratch");
 			colNames.addAll(Arrays.asList(new String[] {
@@ -69,24 +71,24 @@ public class OptionsTable {
 			}));
 			data.add(new ArrayList<String>(Arrays.asList(new String[]{// "set"
 					"A","B","C","D"
-					})));
+			})));
 			data.add(new ArrayList<String>(Arrays.asList(new String[]{// "treatment"
 					"control","treated"
-					})));
+			})));
 			data.add(new ArrayList<String>(Arrays.asList(new String[]{// "replicate"
 					"1","2","3","4"
-					})));
+			})));
 			data.add(new ArrayList<String>(Arrays.asList(new String[]{// "genotype"
 					"Col","Ler","Ws","Cvi"
-					})));		
+			})));		
 			rows=4;
 		}
-		
+
 	}
 
 	public OptionsTable() {
 		frame = new JFrame("Options");
-		table = new JTable(5,5);
+//		table = new JTable(5,5);
 		getInitialValues();
 		setTable();
 		buttonPanel = new JPanel();
@@ -101,18 +103,20 @@ public class OptionsTable {
 		frame.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent arg0) {
-					frame.setVisible(false);
+				frame.setVisible(false);
 			}
 		});
 	}
-	
+
 	private void setTable() {
 		table = new JTable(rows,data.size());
+		table.setC
 		table.setShowHorizontalLines(true);
 		table.setShowVerticalLines(true);
 		table.setGridColor(Color.BLACK);
+		table.setModel(new tableModel(rows,colNames,data));
 	}
-	
+
 	public void setButtons(JPanel bp) {
 		bp.setLayout(new BoxLayout(bp, BoxLayout.Y_AXIS));
 		JButton addRowButton = new JButton("Add Row");
@@ -124,12 +128,12 @@ public class OptionsTable {
 		doneButton.addActionListener(new doneListener());
 		JButton cancelButton = new JButton("Cancel");
 		cancelButton.addActionListener(new cancelListener());
-		
-		
+
+
 		JTextArea info = new JTextArea("Each column represents one type of annotation.\n\n" + 
-										"If you want to have a pull-down list of allowable data\n" +
-										"then place allowable values in the rows\n" +
-										"otherwise leave blank and a text entry field will be presented\n");
+				"If you want to have a pull-down list of allowable data\n" +
+				"then place allowable values in the rows\n" +
+				"otherwise leave blank and a text entry field will be presented\n");
 		info.setEditable(false);
 		bp.add(info);
 		bp.add(addRowButton);
@@ -137,7 +141,7 @@ public class OptionsTable {
 		bp.add(doneButton);
 		bp.add(cancelButton);
 	}
-	
+
 	class addRowListener implements ActionListener {
 		public void actionPerformed(ActionEvent event) {
 			System.out.println("row listener");
@@ -166,7 +170,7 @@ public class OptionsTable {
 			getColumn.setVisible(true);
 		}
 	}
-		
+
 	class doneListener implements ActionListener {
 		public void actionPerformed(ActionEvent event) {
 			System.out.println("Done listener");
@@ -174,17 +178,47 @@ public class OptionsTable {
 			for(int col = 0; col < table.getColumnCount();col++) {
 				for(int row = 0; row < table.getRowCount();row++) {
 					System.out.println(table.getValueAt(row, col));
+				}
 			}
-		}
-		frame.dispose();
+			frame.dispose();
 		}
 	}
-	
+
 	class cancelListener implements ActionListener {
 		public void actionPerformed(ActionEvent event) {
 			System.out.println("Cancel listener");
 			frame.dispose();
 		}
+	}
+	
+	static class tableModel extends AbstractTableModel {
+		
+		int rows;
+		ArrayList<String> colNames;
+		ArrayList<ArrayList<String>> values;
+		
+		public tableModel(int rows, ArrayList<String> colNames, ArrayList<ArrayList<String>> values) {
+			this.rows = rows;
+			this.colNames = colNames;
+			this.values = values;
+		}
 
+		@Override
+		public int getColumnCount() {
+			return colNames.size();
+		}
+		@Override
+		public int getRowCount() {
+			return rows;
+		}
+		@Override
+		public Object getValueAt(int row, int col) {
+			return values.get(row).get(col);
+		}
+
+		public Class<?> getColumnClass(int col) {
+			return String.class;
+		}
+	}
 }
-}
+
