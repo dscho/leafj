@@ -29,6 +29,8 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
+import sun.awt.SunHints.Value;
+
 public class OptionsTable {
 
 	JFrame frame;
@@ -110,7 +112,6 @@ public class OptionsTable {
 
 	private void setTable() {
 		table = new JTable(rows,data.size());
-		table.setC
 		table.setShowHorizontalLines(true);
 		table.setShowVerticalLines(true);
 		table.setGridColor(Color.BLACK);
@@ -204,6 +205,11 @@ public class OptionsTable {
 		}
 
 		@Override
+	     public String getColumnName(int column) {
+	         return colNames.get(column);
+	     }
+		
+		@Override
 		public int getColumnCount() {
 			return colNames.size();
 		}
@@ -213,8 +219,20 @@ public class OptionsTable {
 		}
 		@Override
 		public Object getValueAt(int row, int col) {
-			return values.get(row).get(col);
+			System.out.println("requested value for row " + row + ", col " + col);
+			if (row + 1 > values.get(col).size()) {
+				return null;
+			} else {
+				System.out.println(values.get(col).get(row));
+				return values.get(col).get(row);
+			}
 		}
+		
+		public boolean isCellEditable(int row, int col) {
+			return true;
+		}
+		
+		
 
 		public Class<?> getColumnClass(int col) {
 			return String.class;
