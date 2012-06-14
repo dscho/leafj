@@ -49,8 +49,10 @@ public class OptionsTable {
 	}
 
 	private void getInitialValues() {
-		File file = new File("leafJ_defaults.txt");
 		try {
+			File directory = new File(".");
+			System.out.println("trying to open " + directory.getCanonicalPath() + "/leafJ_defaults.txt");
+			File file = new File(directory.getCanonicalPath() + "/leafJ_defaults.txt");
 			BufferedReader input = new BufferedReader(new FileReader(file));
 
 			String header = input.readLine();
@@ -58,10 +60,10 @@ public class OptionsTable {
 
 			while (true) { 
 				String line = input.readLine();
+				System.out.println(line);
 				if (line == null) break;
 				if (line.trim().length() == 0) continue;
-				ArrayList<String> fields = new ArrayList<String>(Arrays.asList(line.split("\t")));
-				data.add(fields);	
+				data.add(new ArrayList<String>(Arrays.asList(line.split("\t"))));	
 				rows++;
 			}
 			input.close();
@@ -75,7 +77,7 @@ public class OptionsTable {
 					"A","B","C","D"
 			})));
 			data.add(new ArrayList<String>(Arrays.asList(new String[]{// "treatment"
-					"control","treated"
+					"control","treated",null,null
 			})));
 			data.add(new ArrayList<String>(Arrays.asList(new String[]{// "replicate"
 					"1","2","3","4"
@@ -85,7 +87,6 @@ public class OptionsTable {
 			})));		
 			rows=4;
 		}
-
 	}
 
 	public OptionsTable() {
@@ -232,8 +233,17 @@ public class OptionsTable {
 			return true;
 		}
 		
+		@Override
+		public void setValueAt(Object newValue, int row, int col) {
+			if (row + 1 > values.get(col).size()) {
+				//need to expand the row ArrayList to include new value
+				values.get(col).ensureCapacity(row + 1);
+				values.get(col).add(row, newValue.toString());
+			} else {
+				values.get(col).set(row, newValue.toString());
+			} 
+		}
 		
-
 		public Class<?> getColumnClass(int col) {
 			return String.class;
 		}
