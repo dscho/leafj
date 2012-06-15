@@ -126,6 +126,7 @@ public class OptionsTable {
 		table.setShowHorizontalLines(true);
 		table.setShowVerticalLines(true);
 		table.setGridColor(Color.BLACK);
+		table.getColumnModel().setColumnSelectionAllowed(true);
 //		table.setModel(new DefaultTableModel());
 		table.setModel(new ALTableModel(rows, colNames, data));
 	}
@@ -136,7 +137,8 @@ public class OptionsTable {
 		addRowButton.addActionListener(new addRowListener());
 		JButton addColumnButton = new JButton("Add Column");
 		addColumnButton.addActionListener(new addColListener());
-
+		JButton deleteColumnButton = new JButton("Delete Column(s)");
+		deleteColumnButton.addActionListener(new deleteColListener());
 		JButton doneButton = new JButton("Done");
 		doneButton.addActionListener(new doneListener());
 		JButton cancelButton = new JButton("Cancel");
@@ -151,6 +153,7 @@ public class OptionsTable {
 		bp.add(info);
 		bp.add(addRowButton);
 		bp.add(addColumnButton);
+		bp.add(deleteColumnButton);
 		bp.add(doneButton);
 		bp.add(cancelButton);
 	}
@@ -180,6 +183,15 @@ public class OptionsTable {
 			getColumn.getContentPane().add(colNameField);
 			getColumn.pack();
 			getColumn.setVisible(true);
+		}
+	}
+	
+	class deleteColListener implements ActionListener {
+		public void actionPerformed(ActionEvent event) {
+			System.out.println("delete column listener");
+			((ALTableModel) table.getModel()).deleteColumns(
+					table.getColumnModel().getSelectedColumns());
+//			((DefaultTableModel) table.getModel()).addRow(new Object[table.getColumnCount()]);
 		}
 	}
 
@@ -212,6 +224,14 @@ public class OptionsTable {
 			this.rows = rows;
 			this.colNames = colNames;
 			this.values = values;
+		}
+
+		public void deleteColumns(int[] columns) {
+			for (int c: columns){
+				values.remove(c);
+				colNames.remove(c);
+				this.fireTableStructureChanged();
+			}
 		}
 
 		@Override
