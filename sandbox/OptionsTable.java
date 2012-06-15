@@ -57,13 +57,23 @@ public class OptionsTable {
 
 			String header = input.readLine();
 			colNames.addAll(Arrays.asList(header.split("\t")));
+			
+			for (int i = 0; i <= colNames.size();i++) {
+				data.add(new ArrayList<String>());
+			}
 
 			while (true) { 
 				String line = input.readLine();
 				System.out.println(line);
 				if (line == null) break;
 				if (line.trim().length() == 0) continue;
-				data.add(new ArrayList<String>(Arrays.asList(line.split("\t"))));	
+				String[] cells = line.split("\t");
+				int i = 0;
+				for (String cell:cells) {
+					data.get(i).add(cell);
+					i++;
+				}
+//				data.add(new ArrayList<String>(Arrays.asList(line.split("\t"))));	
 				rows++;
 			}
 			input.close();
@@ -116,7 +126,8 @@ public class OptionsTable {
 		table.setShowHorizontalLines(true);
 		table.setShowVerticalLines(true);
 		table.setGridColor(Color.BLACK);
-		table.setModel(new tableModel(rows,colNames,data));
+//		table.setModel(new DefaultTableModel());
+		table.setModel(new ALTableModel(rows, colNames, data));
 	}
 
 	public void setButtons(JPanel bp) {
@@ -147,23 +158,22 @@ public class OptionsTable {
 	class addRowListener implements ActionListener {
 		public void actionPerformed(ActionEvent event) {
 			System.out.println("row listener");
-			DefaultTableModel tmodel = (DefaultTableModel) table.getModel();
-			tmodel.addRow(new Vector<Object>());
+			((ALTableModel) table.getModel()).addRow();
+//			((DefaultTableModel) table.getModel()).addRow(new Object[table.getColumnCount()]);
 		}
 	}
 
 	class addColListener implements ActionListener {
 		public void actionPerformed(ActionEvent event) {
-			final String colName;
 			System.out.println("col listener");
-			final TableColumn tc = new TableColumn();
 			final JFrame getColumn = new JFrame("Enter column name");
 			final JTextField colNameField = new JTextField(25);
 			colNameField.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent event) {
-					tc.setHeaderValue(colNameField.getText());
+					((ALTableModel) table.getModel()).addColumn(colNameField.getText());
+//					((DefaultTableModel) table.getModel()).addColumn(new Object[table.getColumnCount()]);
+					
 					getColumn.dispose();
-					table.addColumn(tc);
 				}
 			});
 			getColumn.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -193,13 +203,12 @@ public class OptionsTable {
 		}
 	}
 	
-	static class tableModel extends AbstractTableModel {
-		
+	static class ALTableModel extends AbstractTableModel {
 		int rows;
 		ArrayList<String> colNames;
 		ArrayList<ArrayList<String>> values;
 		
-		public tableModel(int rows, ArrayList<String> colNames, ArrayList<ArrayList<String>> values) {
+		public ALTableModel(int rows, ArrayList<String> colNames, ArrayList<ArrayList<String>> values) {
 			this.rows = rows;
 			this.colNames = colNames;
 			this.values = values;
@@ -229,19 +238,35 @@ public class OptionsTable {
 			}
 		}
 		
+		public void addColumn(String colName) {
+			values.add(new ArrayList<String>());
+			colNames.add(colName);
+			this.fireTableStructureChanged();
+		}
+		
+		public void addRow() {
+			rows++;
+			this.fireTableStructureChanged();
+		}
+		
 		public boolean isCellEditable(int row, int col) {
 			return true;
 		}
 		
 		@Override
 		public void setValueAt(Object newValue, int row, int col) {
+			System.out.println("setting new value at row " + row + ", column " + col);
+			System.out.println("current number of columns is " + values.size());
+			System.out.println("current size of column is " + values.get(col).size());
 			if (row + 1 > values.get(col).size()) {
-				//need to expand the row ArrayList to include new value
-				values.get(col).ensureCapacity(row + 1);
-				values.get(col).add(row, newValue.toString());
-			} else {
-				values.get(col).set(row, newValue.toString());
+				System.out.println("expanding");
+				//add empty entries up through the cell that we want to set
+				for (int s = values.get(col).size(); s < row +1; s++) {
+					System.out.println("loop.  s=" + s + " row = " + row);
+					values.get(col).add(null);
+				}
 			} 
+			values.get(col).set(row, newValue.toString()); 
 		}
 		
 		public Class<?> getColumnClass(int col) {
