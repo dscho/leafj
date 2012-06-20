@@ -28,7 +28,6 @@ public class widthArrayLeaf {
 	private double[] tmp;
 
 
-	//probably can get rid of widthThreshold...a holdover from hypocotyl measurement.
 	private double widthThreshold;		//width at petiole top should be less than this threshold
 
 	private int window;			//larger window for looking for big changes
@@ -110,13 +109,21 @@ public class widthArrayLeaf {
 
 		//move up petiole while
 		while(diff[i] == 0 //no difference in width
-		        || widths[i] < widthThreshold //width is too small (less than threshold)
-		        || diff[i] < threshold //difference is less than diffThreshold
+		        || widths[i] < widthThreshold 	//width is too small (less than threshold)
+		        								//currently width must not be in the narrowest 5%
+		        						   		// This prevents errant calls at the very base of the petiole.
+		        
+		        || diff[i] < threshold			//difference is less than diffThreshold.
+		        								//this is the main method for detecting boundary
+		        								//Currently the threshold is 90%.  ie the change in width must be
+		        								//above the 90% largest difference in width.
+		        				
 		        || getMax(diff,i-runningWindow,i) > windowThreshold //& max differences is greater than window threshold
 		        //the idea is to not let abrupt changes at the beginning mess things up.
+		        //this ensures that the region below the current test area is relatively even.
 
 		        || widths[i + (int) Math.round(widths.length/5)] < 1.5*widths[i] )
-			// if we are at the junction then moving 20% up the leaf should be much wider than where we are.
+				// if we are at the junction then moving 20% up the leaf should be much wider than where we are.
 		{
 			if (verbose >1) {
 				IJ.log("i: " + IJ.d2s(i,0) + " diff[i]: " + IJ.d2s(diff[i]) + " diff[i+runningWindow]" +
@@ -219,7 +226,6 @@ public class widthArrayLeaf {
 		int i = 0;
 		while (tmpDiff[i] == 0) i++;		//find where non-zero data starts
 		int nonZeroLength = tmpDiff.length-i;
-		//threshold = tmpDiff[(int) Math.round(.25*nonZeroLength) + i] * 2;	//threshold is 2 * the .25 quantile
 		threshold = tmpDiff[(int) Math.round(.90*nonZeroLength) + i];	//threshold is 90%
 		windowThreshold=threshold;
 		window = nonZeroLength/7;

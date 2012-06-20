@@ -182,6 +182,7 @@ public class OptionsTable {
 			getColumn.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			getColumn.getContentPane().add(colNameField);
 			getColumn.pack();
+			getColumn.setLocationRelativeTo(table);
 			getColumn.setVisible(true);
 		}
 	}
