@@ -21,9 +21,6 @@ import ij.plugin.frame.*;
 import java.util.Arrays;
 import java.util.Comparator;
 
-
-
-
 public class LeafJ_ implements PlugInFilter {
 	ImagePlus imp;
 	public int verbose = 0;

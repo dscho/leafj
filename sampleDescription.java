@@ -48,6 +48,9 @@ public class sampleDescription {
 	
 	sampleDescription() {
 		//read defaults if they exist
+		OptionsTable ot = new OptionsTable();
+		ot.editTable();
+		
 		if (defaultFile.exists()) try {
 			FileReader fr = new FileReader(defaultFile);
 			BufferedReader in = new BufferedReader(fr);
@@ -108,7 +111,7 @@ public class sampleDescription {
 		gd.hideCancelButton();
 		gd.showDialog();
 		
-		//populate array with conents of dialog box
+		//populate array with contents of dialog box
 		for (int i = 0; i < fieldNames.length; i++) {
 			//ugly!!
 			switch(i) {

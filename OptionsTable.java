@@ -1,4 +1,4 @@
-package sandbox;
+
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -10,14 +10,13 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -26,10 +25,8 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.BoxLayout;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
 
-import sun.awt.SunHints.Value;
+import ij.Prefs;
 
 public class OptionsTable {
 
@@ -39,22 +36,14 @@ public class OptionsTable {
 	ArrayList<ArrayList <String>> data = new ArrayList<ArrayList<String>>();
 	ArrayList<String> colNames = new ArrayList<String>();
 	int rows = 0; //initial number of rows
-
-	public static void main(String[] args) {
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run () {
-				OptionsTable ot = new OptionsTable();
-			}
-		});
-	}
+	private String prefsPath = ij.Prefs.getDefaultDirectory();
+	private String fileName = "LeafJ_defaults.txt";
+	private File defaultFile = new File(prefsPath,fileName);
 
 	private void getInitialValues() {
 		try {
-			File directory = new File(".");
-			System.out.println("trying to open " + directory.getCanonicalPath() + "/leafJ_defaults.txt");
-			File file = new File(directory.getCanonicalPath() + "/leafJ_defaults.txt");
-			BufferedReader input = new BufferedReader(new FileReader(file));
-
+			System.out.println("trying to open " + defaultFile);
+			BufferedReader input = new BufferedReader(new FileReader(defaultFile));
 			String header = input.readLine();
 			colNames.addAll(Arrays.asList(header.split("\t")));
 			
@@ -100,25 +89,7 @@ public class OptionsTable {
 	}
 
 	public OptionsTable() {
-		frame = new JFrame("Options");
-//		table = new JTable(5,5);
 		getInitialValues();
-		setTable();
-		buttonPanel = new JPanel();
-		setButtons(buttonPanel);
-		JScrollPane scrollPane = new JScrollPane(table);
-		scrollPane.setOpaque(true);
-		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-		frame.add(scrollPane,BorderLayout.WEST);
-		frame.add(buttonPanel,BorderLayout.EAST);
-		frame.pack();
-		frame.setVisible(true);	
-		frame.addWindowListener(new WindowAdapter() {
-			@Override
-			public void windowClosing(WindowEvent arg0) {
-				frame.setVisible(false);
-			}
-		});
 	}
 
 	private void setTable() {
@@ -131,6 +102,32 @@ public class OptionsTable {
 		table.setModel(new ALTableModel(rows, colNames, data));
 	}
 
+	public void editTable() {
+		SwingUtilities.invokeLater(new Runnable() { //note could also be invoke and wait?
+			public void run () {
+				frame = new JFrame("Options");
+				setTable();
+				buttonPanel = new JPanel();
+				setButtons(buttonPanel);
+				JScrollPane scrollPane = new JScrollPane(table);
+				scrollPane.setOpaque(true);
+				frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+				frame.add(scrollPane,BorderLayout.WEST);
+				frame.add(buttonPanel,BorderLayout.EAST);
+				frame.pack();
+				frame.setVisible(true);	
+				frame.addWindowListener(new WindowAdapter() {
+					@Override
+					public void windowClosing(WindowEvent arg0) {
+						frame.setVisible(false);
+					}
+				});
+			}
+		});
+	}
+	
+	public void addDoneListener()
+	
 	public void setButtons(JPanel bp) {
 		bp.setLayout(new BoxLayout(bp, BoxLayout.Y_AXIS));
 		JButton addRowButton = new JButton("Add Row");
@@ -144,11 +141,10 @@ public class OptionsTable {
 		JButton cancelButton = new JButton("Cancel");
 		cancelButton.addActionListener(new cancelListener());
 
-
 		JTextArea info = new JTextArea("Each column represents one type of annotation.\n\n" + 
 				"If you want to have a pull-down list of allowable data\n" +
 				"then place allowable values in the rows\n" +
-				"otherwise leave blank and a text entry field will be presented\n");
+				"otherwise leave blank and a text entry field will be presented\ntest2\n");
 		info.setEditable(false);
 		bp.add(info);
 		bp.add(addRowButton);
