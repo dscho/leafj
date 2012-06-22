@@ -2,6 +2,7 @@ package sandbox;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
@@ -19,6 +20,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
@@ -102,20 +104,28 @@ public class DialogTest extends JDialog {
 		bp.setLayout(new BoxLayout(bp, BoxLayout.Y_AXIS));
 		JButton addRowButton = new JButton("Add Row");
 		addRowButton.addActionListener(new addRowListener());
+		addRowButton.setAlignmentX(Component.LEFT_ALIGNMENT);
 		JButton addColumnButton = new JButton("Add Column");
 		addColumnButton.addActionListener(new addColListener());
+		addColumnButton.setAlignmentX(Component.LEFT_ALIGNMENT);
 		JButton deleteColumnButton = new JButton("Delete Column(s)");
 		deleteColumnButton.addActionListener(new deleteColListener());
+		deleteColumnButton.setAlignmentX(Component.LEFT_ALIGNMENT);
 		JButton doneButton = new JButton("Done");
 		doneButton.addActionListener(new doneListener());
+		doneButton.setAlignmentX(Component.LEFT_ALIGNMENT);
 		JButton cancelButton = new JButton("Cancel");
 		cancelButton.addActionListener(new cancelListener());
+		cancelButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+
 
 		JTextArea info = new JTextArea("Each column represents one type of annotation.\n\n" + 
 				"If you want to have a pull-down list of allowable data\n" +
 				"then place allowable values in the rows\n" +
 				"otherwise leave blank and a text entry field will be presented\ntest2\n");
 		info.setEditable(false);
+		info.setAlignmentX(Component.LEFT_ALIGNMENT);
+		
 		bp.add(info);
 		bp.add(addRowButton);
 		
@@ -123,6 +133,7 @@ public class DialogTest extends JDialog {
 		addColPanel.add(addColumnButton);
 		colNameField = new JTextField("New column name",20);
 		addColPanel.add(colNameField);
+		addColPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
 		
 //		bp.add(addColumnButton);
