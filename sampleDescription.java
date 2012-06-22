@@ -14,7 +14,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.SwingUtilities;
 
-import sandbox.DialogTest;
+import java.awt.Button;
 
 //check for configuration file
 //if no configuration file, present a generic table
@@ -48,6 +48,7 @@ public class sampleDescription {
 	private String filepath = "leaf_measure_defaults.txt";
 	private File defaultFile = new File(filepath);
 	public Boolean saveRois;
+	private OptionsTable ot;
 
 		
 	
@@ -56,22 +57,7 @@ public class sampleDescription {
 			SwingUtilities.invokeAndWait(new Runnable() { //note could also be invoke and wait?
 				public void run () {
 			//read defaults if they exist
-			OptionsTable ot = new OptionsTable(null);
-			ot.editTable();
-
-			
-			if (defaultFile.exists()) try {
-				FileReader fr = new FileReader(defaultFile);
-				BufferedReader in = new BufferedReader(fr);
-				for (int i : defaultsIndex) {
-					defaults[i] = in.readLine();
-				}
-				fr.close();
-			} catch  (FileNotFoundException e) {
-				IJ.showMessage("Defaults file not found");
-			} catch (IOException e) {
-				IJ.showMessage("IO error reading defaults");
-			}
+			ot = new OptionsTable(null);
 }
 			});
 		} catch (InterruptedException e) {
@@ -87,8 +73,6 @@ public class sampleDescription {
 		defaults[7] = filename;
 		getInput();
 	}
-	
-		
 				
 	public void getInput() {
 		//allow user to define some inputs
@@ -127,8 +111,13 @@ public class sampleDescription {
 		}
 		gd.addCheckbox("Save Set, Dissected by, and Measured by, as defaults?",true);
 		gd.addCheckbox("Save Rois to file?",true);
-		gd.hideCancelButton();
+		gd.setCancelLabel("Edit these options");
+		gd.setOKLabel("Continue");
 		gd.showDialog();
+		
+		if(gd.wasCanceled()) {
+			ot.editTable();
+		}
 		
 		//populate array with contents of dialog box
 		for (int i = 0; i < fieldNames.length; i++) {
@@ -160,7 +149,7 @@ public class sampleDescription {
 		}
 		
 		saveRois = gd.getNextBoolean();
-			
+					
 	}
 	
 	public String getFieldNames() {
