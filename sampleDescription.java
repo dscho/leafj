@@ -10,6 +10,11 @@
 import ij.*;
 import ij.gui.*;
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
+
+import javax.swing.SwingUtilities;
+
+import sandbox.DialogTest;
 
 //check for configuration file
 //if no configuration file, present a generic table
@@ -47,21 +52,34 @@ public class sampleDescription {
 		
 	
 	sampleDescription() {
-		//read defaults if they exist
-		OptionsTable ot = new OptionsTable();
-		ot.editTable();
-		
-		if (defaultFile.exists()) try {
-			FileReader fr = new FileReader(defaultFile);
-			BufferedReader in = new BufferedReader(fr);
-			for (int i : defaultsIndex) {
-				defaults[i] = in.readLine();
+		try {
+			SwingUtilities.invokeAndWait(new Runnable() { //note could also be invoke and wait?
+				public void run () {
+			//read defaults if they exist
+			OptionsTable ot = new OptionsTable(null);
+			ot.editTable();
+
+			
+			if (defaultFile.exists()) try {
+				FileReader fr = new FileReader(defaultFile);
+				BufferedReader in = new BufferedReader(fr);
+				for (int i : defaultsIndex) {
+					defaults[i] = in.readLine();
+				}
+				fr.close();
+			} catch  (FileNotFoundException e) {
+				IJ.showMessage("Defaults file not found");
+			} catch (IOException e) {
+				IJ.showMessage("IO error reading defaults");
 			}
-			fr.close();
-		} catch  (FileNotFoundException e) {
-			IJ.showMessage("Defaults file not found");
-		} catch (IOException e) {
-			IJ.showMessage("IO error reading defaults");
+}
+			});
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 	
@@ -69,6 +87,7 @@ public class sampleDescription {
 		defaults[7] = filename;
 		getInput();
 	}
+	
 		
 				
 	public void getInput() {
