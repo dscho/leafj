@@ -114,7 +114,6 @@ public class OptionsTable extends JDialog {
 
 	}
 
-
 	private void setTable() {
 		table = new JTable(rows,data.size());
 		table.setShowHorizontalLines(true);
@@ -142,7 +141,6 @@ public class OptionsTable extends JDialog {
 		cancelButton.addActionListener(new cancelListener());
 		cancelButton.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-
 		JTextArea info = new JTextArea("Each column represents one type of annotation.\n\n" + 
 				"If you want to have a pull-down list of allowable data\n" +
 				"then place allowable values in the rows\n" +
@@ -159,8 +157,6 @@ public class OptionsTable extends JDialog {
 		addColPanel.add(colNameField);
 		addColPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-		
-//		bp.add(addColumnButton);
 		bp.add(addColPanel);
 		bp.add(deleteColumnButton);
 		bp.add(doneButton);
@@ -172,7 +168,6 @@ public class OptionsTable extends JDialog {
 		public void actionPerformed(ActionEvent event) {
 			System.out.println("row listener");
 			((ALTableModel) table.getModel()).addRow();
-//			((DefaultTableModel) table.getModel()).addRow(new Object[table.getColumnCount()]);
 		}
 	}
 
@@ -188,7 +183,6 @@ public class OptionsTable extends JDialog {
 			System.out.println("delete column listener");
 			((ALTableModel) table.getModel()).deleteColumns(
 					table.getColumnModel().getSelectedColumns());
-//			((DefaultTableModel) table.getModel()).addRow(new Object[table.getColumnCount()]);
 		}
 	}
 

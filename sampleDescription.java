@@ -71,8 +71,8 @@ public class sampleDescription {
 			}
 		}
 			
-		gd.addCheckbox("Save Set, Dissected by, and Measured by, as defaults?",true);
-		gd.addCheckbox("Save Rois to file?",true);
+//		gd.addCheckbox("Save Set, Dissected by, and Measured by, as defaults?",true);
+//		gd.addCheckbox("Save Rois to file?",true);
 		gd.setCancelLabel("Edit these options");
 		gd.setOKLabel("Continue");
 		gd.showDialog();
