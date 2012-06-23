@@ -107,8 +107,8 @@ public class OptionsTable extends JDialog {
 
 	private void getInitialValues() {
 		try {
-			IJ.log("default directory" + prefsPath);
-			IJ.log("trying to open " + defaultFile);
+			//IJ.log("default directory" + prefsPath);
+			//IJ.log("trying to open " + defaultFile);
 			BufferedReader input = new BufferedReader(new FileReader(defaultFile));
 
 		//note that the defaults are stored in a transposed table...
@@ -249,7 +249,7 @@ public class OptionsTable extends JDialog {
 				output.close();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				IJ.log("IO excepction writing file: " + defaultFile);
+				IJ.log("IO exception writing file: " + defaultFile);
 				e.printStackTrace();
 			} 	
 			dispose();
