@@ -66,12 +66,34 @@ public class OptionsTable extends JDialog {
 		setVisible(true);
 		//		return "hello";
 	}
+	
+	public int getNumberOfFields() {
+		return colNames.size();
+	}
+	
+	public String getFieldName(int field) {
+		return colNames.get(field);
+	}
+	
+	public String[] getFieldValues(int field) {
+		//need to trim null values out of the ArrayList before returning
+		ArrayList<String> returnValues = new ArrayList<String>();
+		if (data.get(field).get(0) != null) { //insert a blank item first if list is not blank
+											  //this causes the first item in the list to be blank
+								   			  //should help prevent carry-over mistakes
+			returnValues.add("");
+		}
+		for (String item: data.get(field)) {
+			if (item != null) returnValues.add(item);
+		}		
+		return returnValues.toArray(new String[0]);//adding the new String[] ensures that a String[] is returned
+	}
 
 	private void getInitialValues() {
 
 		System.out.println("Can't open defaults files; generating from scratch");
 		colNames.addAll(Arrays.asList(new String[] {
-				"set", "treatment","replicate","genotype"
+				"set", "treatment","replicate","genotype","date"
 		}));
 		data.add(new ArrayList<String>(Arrays.asList(new String[]{// "set"
 				"A","B","C","D"
@@ -84,7 +106,10 @@ public class OptionsTable extends JDialog {
 		})));
 		data.add(new ArrayList<String>(Arrays.asList(new String[]{// "genotype"
 				"Col","Ler","Ws","Cvi"
-		})));		
+		})));	
+		data.add(new ArrayList<String>(Arrays.asList(new String[]{// "date"
+				null,null,null,null
+		})));
 		rows=4;
 
 	}
@@ -154,21 +179,7 @@ public class OptionsTable extends JDialog {
 	class addColListener implements ActionListener {
 		public void actionPerformed(ActionEvent event) {
 			System.out.println("col listener");
-//			final JFrame getColumn = new JFrame("Enter column name");
-//			final JTextField colNameField = new JTextField(25);
-//			colNameField.addActionListener(new ActionListener() {
-//				public void actionPerformed(ActionEvent event) {
 					((ALTableModel) table.getModel()).addColumn(colNameField.getText());
-//					((DefaultTableModel) table.getModel()).addColumn(new Object[table.getColumnCount()]);
-					
-//				getColumn.dispose();
-//				}
-//			});
-//			getColumn.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//			getColumn.getContentPane().add(colNameField);
-//			getColumn.pack();
-//			getColumn.setLocationRelativeTo(table);
-//			getColumn.setVisible(true);
 		}
 	}
 	
