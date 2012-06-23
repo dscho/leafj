@@ -75,16 +75,17 @@ public class OptionsTable extends JDialog {
 		return colNames.get(field);
 	}
 	
-	public String[] getFieldNames() {
-		return colNames.toArray(new String[0]);
+	public ArrayList<String> getFieldNames() {
+		return colNames;
 	}
 	
 	public String[] getFieldValues(int field) {
 		//need to trim null values out of the ArrayList before returning
 		ArrayList<String> returnValues = new ArrayList<String>();
-		if (data.get(field).get(0) != null) { //insert a blank item first if list is not blank
-											  //this causes the first item in the list to be blank
-								   			  //should help prevent carry-over mistakes
+		if (!data.get(field).isEmpty() &&  data.get(field).get(0) != null) {
+			//insert a blank item first if list is not blank
+			 //this causes the first item in the list to be blank
+ 			 //should help prevent carry-over mistakes
 			returnValues.add("");
 		}
 		for (String item: data.get(field)) {

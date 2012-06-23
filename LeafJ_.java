@@ -127,7 +127,7 @@ public class LeafJ_ implements PlugInFilter {
 		//hmmm looks like results table can only take numeric values
 		//use TextPanel class
 		
-		if (sd.saveRois) rm.runCommand("Save", imp.getShortTitle() + sd.getGtTrtRep() + "_roi.zip");
+		if (sd.saveRois) rm.runCommand("Save", imp.getShortTitle() + sd.getTruncatedDescription() + "_roi.zip");
 		results.setHeadings(sd.getFieldNames());
 		results.show();
 		results.addResults(sd,rm,tip,timp);
