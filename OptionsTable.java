@@ -110,26 +110,20 @@ public class OptionsTable extends JDialog {
 			IJ.log("default directory" + prefsPath);
 			IJ.log("trying to open " + defaultFile);
 			BufferedReader input = new BufferedReader(new FileReader(defaultFile));
-			String header = input.readLine();
-			colNames.addAll(Arrays.asList(header.split("\t")));
 
-			for (int i = 0; i <= colNames.size();i++) {
-				data.add(new ArrayList<String>());
-			}
+		//note that the defaults are stored in a transposed table...
+			int rows = 0;
 			while (true) { 
 				String line = input.readLine();
 				System.out.println(line);
 				if (line == null) break;
 				if (line.trim().length() == 0) continue;
-				String[] cells = line.split("\t");
-				int i = 0;
-				for (String cell:cells) {
-					data.get(i).add(cell);
-					i++;
+				ArrayList<String> cells = new ArrayList<String>(Arrays.asList(line.split("\t")));
+				colNames.add(cells.remove(0));
+				data.add(cells);
+				rows = Math.max(rows,cells.size());
 				}
-				//				data.add(new ArrayList<String>(Arrays.asList(line.split("\t"))));	
-				rows++;
-			}
+			
 			input.close();
 
 
@@ -234,31 +228,28 @@ public class OptionsTable extends JDialog {
 			System.out.println("Done listener");
 			setVisible(false);
 			try {
+				//will transpose table before writing for ease...
 				BufferedWriter output = new BufferedWriter(new FileWriter(defaultFile));
-				//we will transpose the options table for reading and writing: this makes for 
-				//easier reading and writing.
-				for(String s: colNames){
-					output.write(s + "\t");
-					IJ.log("writing colname: " + s);
-				}
+
 				output.newLine();
-				for(int row = 0; row < table.getRowCount();row++) {
-//					IJ.log("starting row: " + row + " of " + table.getRowCount() +"total\n" );
-					for(int col = 0; col < table.getColumnCount();col++) {
-//						IJ.log("starting col: " + col + " of " + table.getColumnCount() +"total\n" );
+				for(int col = 0; col < table.getColumnCount();col++) {
+					//IJ.log("starting col: " + col + " of " + table.getColumnCount() +"total\n" );
+					output.write(colNames.get(col) + "\t");
+					for(int row = 0; row < table.getRowCount();row++) {
+						//IJ.log("starting row: " + row + " of " + table.getRowCount() +"total\n" );
 						if (table.getValueAt(row,col) != null) {
 							output.write((String) table.getValueAt(row, col));
+							output.write(("\t"));
 						} 
-						output.write(("\t"));
-//						IJ.log("writing " + table.getValueAt(row, col));
+						//IJ.log("writing " + table.getValueAt(row, col));
 					}
 					output.newLine();
 				}
-//				IJ.log("about to close prefs file");
+				//IJ.log("about to close prefs file");
 				output.close();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				IJ.log("IO excepction writing file");
+				IJ.log("IO excepction writing file: " + defaultFile);
 				e.printStackTrace();
 			} 	
 			dispose();
@@ -308,7 +299,7 @@ public class OptionsTable extends JDialog {
 		@Override
 		public Object getValueAt(int row, int col) {
 			System.out.println("requested value for row " + row + ", col " + col);
-			if (row + 1 > values.get(col).size()) {
+			if (row + 1 > values.get(col).size() || values.get(col).get(row) == "" ) {
 				return null;
 			} else {
 				System.out.println(values.get(col).get(row));

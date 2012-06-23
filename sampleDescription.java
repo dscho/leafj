@@ -39,7 +39,7 @@ public class sampleDescription {
 
 	sampleDescription() {
 		try {
-			SwingUtilities.invokeAndWait(new Runnable() { //note could also be invoke and wait?
+			SwingUtilities.invokeAndWait(new Runnable() { 
 				public void run () {
 					//read defaults if they exist
 					ot = new OptionsTable(null);
@@ -64,7 +64,7 @@ public class sampleDescription {
 		ArrayList<String> fieldType = new ArrayList<String>();
 
 		//set up and display dialog box
-		gd.addMessage("Enter terms into relevant fields.  Leave non-applicable fields blank");
+		gd.addMessage("Enter or select values for each field, or click button below to edit this table.");
 
 		for (int i = 0; i < ot.getNumberOfFields();i++){
 			if (ot.getFieldValues(i).length==0) {
