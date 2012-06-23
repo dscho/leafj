@@ -32,33 +32,16 @@ import java.awt.Button;
 
 public class sampleDescription {
 	private GenericDialog gd = new GenericDialog("Sample Description");
-//	private String[] fieldNames = {"Set",
-//		"Treatment",
-//		"Genotype",
-//		"Rep.",
-//		"FT_day",
-//		"FT_month",
-//		"FT_year",
-//		"Image_file",
-//		"Dissected_by",
-//		"Measured_by"};
-//	private String[] description = new String[fieldNames.length];
-//	private int[] defaultsIndex = {0,8,9}; //names of the fields that we want to save as defaults
-//	private String[] defaults = new String[fieldNames.length];
-//	private String filepath = "leaf_measure_defaults.txt";
-//	private File defaultFile = new File(filepath);
 	public Boolean saveRois;
 	private OptionsTable ot;
 
-		
-	
 	sampleDescription() {
 		try {
 			SwingUtilities.invokeAndWait(new Runnable() { //note could also be invoke and wait?
 				public void run () {
-			//read defaults if they exist
-			ot = new OptionsTable(null);
-}
+					//read defaults if they exist
+					ot = new OptionsTable(null);
+				}
 			});
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -88,37 +71,6 @@ public class sampleDescription {
 			}
 		}
 			
-			
-//		for (int i = 0; i < fieldNames.length; i++) {
-//			if (fieldNames[i].equals("Set")) {
-//				gd.addChoice(fieldNames[i],UserDefaults.set,defaults[i]);
-//				continue;
-//			}
-//			if (fieldNames[i].equals("Treatment")) {
-//				gd.addChoice(fieldNames[i],UserDefaults.treatment,defaults[i]);
-//				continue;
-//			}
-//			if (fieldNames[i].equals("Genotype") ){
-//				gd.addChoice(fieldNames[i],UserDefaults.genotype,"");
-//				continue;
-//			}
-//			if (fieldNames[i].equals("Rep.")) {
-//				gd.addChoice(fieldNames[i],UserDefaults.replicate,"");
-//				continue;
-//			}
-//			if (fieldNames[i].equals("FT_day") ||
-//				fieldNames[i].equals("FT_month") || 
-//				fieldNames[i].equals("FT_year")) {
-//					gd.addStringField(fieldNames[i],"",2);
-//					continue;
-//				}
-//			if (fieldNames[i].equals("Image_file") ||
-//				fieldNames[i].equals("Dissected_by") || 
-//				fieldNames[i].equals("Measured_by")) {
-//					gd.addStringField(fieldNames[i],defaults[i],20);
-//					continue;
-//				}
-//		}
 		gd.addCheckbox("Save Set, Dissected by, and Measured by, as defaults?",true);
 		gd.addCheckbox("Save Rois to file?",true);
 		gd.setCancelLabel("Edit these options");
@@ -126,37 +78,11 @@ public class sampleDescription {
 		gd.showDialog();
 		
 		if(gd.wasCanceled()) {
+			gd.dispose();
 			ot.editTable();
+			gd = new GenericDialog("Sample Description");
+			getInput();
 		}
-		
-//		//populate array with contents of dialog box
-//		for (int i = 0; i < fieldNames.length; i++) {
-//			//ugly!!
-//			switch(i) {
-//			case 0:
-//			case 1:
-//			case 2:
-//			case 3: description[i] = gd.getNextChoice(); break;
-//			case 4:
-//			case 5:
-//			case 6:
-//			case 7:
-//			case 8:
-//			case 9: description[i] = gd.getNextString(); break;
-//			}
-//		}
-//		
-		//write defaults to text file if requested.
-//		if (gd.getNextBoolean()) try { //true if save defaults box is checked
-//			FileWriter fw = new FileWriter(defaultFile);
-//			PrintWriter pw = new PrintWriter(fw);
-//			for (int i : defaultsIndex) {
-//				pw.println(description[i]);
-//			}
-//			fw.close();
-//		} catch (IOException e) {
-//			IJ.showMessage("IO error writing defaults");
-//		}
 		
 		saveRois = gd.getNextBoolean();
 					
