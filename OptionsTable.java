@@ -1,12 +1,18 @@
 
+import ij.IJ;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -35,6 +41,11 @@ public class OptionsTable extends JDialog {
 	ArrayList<String> colNames = new ArrayList<String>();
 	int rows = 0; //initial number of rows
 
+	private String prefsPath = ij.Prefs.getPrefsDir();
+	private String fileName = "LeafJDefaults.txt";
+	private File defaultFile = new File(prefsPath,fileName);
+
+
 	OptionsTable(JFrame owner) {
 		super(owner, true);
 
@@ -48,14 +59,14 @@ public class OptionsTable extends JDialog {
 				dispose();
 			}
 		});
-		
+
 		setTable();
 		scrollPane = new JScrollPane(table);
 		scrollPane.setOpaque(true);
-		
+
 		buttonPanel = new JPanel();
 		setButtons(buttonPanel);
-		
+
 		add(scrollPane,BorderLayout.WEST);
 		add(buttonPanel,BorderLayout.EAST);
 		pack();
@@ -66,26 +77,26 @@ public class OptionsTable extends JDialog {
 		setVisible(true);
 		//		return "hello";
 	}
-	
+
 	public int getNumberOfFields() {
 		return colNames.size();
 	}
-	
+
 	public String getFieldName(int field) {
 		return colNames.get(field);
 	}
-	
+
 	public ArrayList<String> getFieldNames() {
 		return colNames;
 	}
-	
+
 	public String[] getFieldValues(int field) {
 		//need to trim null values out of the ArrayList before returning
 		ArrayList<String> returnValues = new ArrayList<String>();
 		if (!data.get(field).isEmpty() &&  data.get(field).get(0) != null) {
 			//insert a blank item first if list is not blank
-			 //this causes the first item in the list to be blank
- 			 //should help prevent carry-over mistakes
+			//this causes the first item in the list to be blank
+			//should help prevent carry-over mistakes
 			returnValues.add("");
 		}
 		for (String item: data.get(field)) {
@@ -95,28 +106,55 @@ public class OptionsTable extends JDialog {
 	}
 
 	private void getInitialValues() {
+		try {
+			IJ.log("default directory" + prefsPath);
+			IJ.log("trying to open " + defaultFile);
+			BufferedReader input = new BufferedReader(new FileReader(defaultFile));
+			String header = input.readLine();
+			colNames.addAll(Arrays.asList(header.split("\t")));
 
-		System.out.println("Can't open defaults files; generating from scratch");
-		colNames.addAll(Arrays.asList(new String[] {
-				"set", "treatment","replicate","genotype","date"
-		}));
-		data.add(new ArrayList<String>(Arrays.asList(new String[]{// "set"
-				"A","B","C","D"
-		})));
-		data.add(new ArrayList<String>(Arrays.asList(new String[]{// "treatment"
-				"control","treated",null,null
-		})));
-		data.add(new ArrayList<String>(Arrays.asList(new String[]{// "replicate"
-				"1","2","3","4"
-		})));
-		data.add(new ArrayList<String>(Arrays.asList(new String[]{// "genotype"
-				"Col","Ler","Ws","Cvi"
-		})));	
-		data.add(new ArrayList<String>(Arrays.asList(new String[]{// "date"
-				null,null,null,null
-		})));
-		rows=4;
+			for (int i = 0; i <= colNames.size();i++) {
+				data.add(new ArrayList<String>());
+			}
+			while (true) { 
+				String line = input.readLine();
+				System.out.println(line);
+				if (line == null) break;
+				if (line.trim().length() == 0) continue;
+				String[] cells = line.split("\t");
+				int i = 0;
+				for (String cell:cells) {
+					data.get(i).add(cell);
+					i++;
+				}
+				//				data.add(new ArrayList<String>(Arrays.asList(line.split("\t"))));	
+				rows++;
+			}
+			input.close();
 
+
+		} catch (IOException e) {
+			System.out.println("Can't open defaults files; generating from scratch");
+			colNames.addAll(Arrays.asList(new String[] {
+					"set", "treatment","replicate","genotype","date"
+			}));
+			data.add(new ArrayList<String>(Arrays.asList(new String[]{// "set"
+					"A","B","C","D"
+			})));
+			data.add(new ArrayList<String>(Arrays.asList(new String[]{// "treatment"
+					"control","treated",null,null
+			})));
+			data.add(new ArrayList<String>(Arrays.asList(new String[]{// "replicate"
+					"1","2","3","4"
+			})));
+			data.add(new ArrayList<String>(Arrays.asList(new String[]{// "genotype"
+					"Col","Ler","Ws","Cvi"
+			})));	
+			data.add(new ArrayList<String>(Arrays.asList(new String[]{// "date"
+					null,null,null,null
+			})));
+			rows=4;
+		}
 	}
 
 	private void setTable() {
@@ -147,15 +185,15 @@ public class OptionsTable extends JDialog {
 		cancelButton.setAlignmentX(Component.LEFT_ALIGNMENT);
 
 		JTextArea info = new JTextArea("Each column represents one type of annotation.\n\n" + 
-				"If you want to have a pull-down list of allowable data\n" +
+				"If you want to have a pull-down list of allowable entries\n" +
 				"then place allowable values in the rows\n" +
-				"otherwise leave blank and a text entry field will be presented\ntest2\n");
+				"otherwise leave blank and a text entry field will be presented\n");
 		info.setEditable(false);
 		info.setAlignmentX(Component.LEFT_ALIGNMENT);
-		
+
 		bp.add(info);
 		bp.add(addRowButton);
-		
+
 		JPanel addColPanel = new JPanel();
 		addColPanel.add(addColumnButton);
 		colNameField = new JTextField("New column name",20);
@@ -167,8 +205,8 @@ public class OptionsTable extends JDialog {
 		bp.add(doneButton);
 		bp.add(cancelButton);
 	}
-	
-	
+
+
 	class addRowListener implements ActionListener {
 		public void actionPerformed(ActionEvent event) {
 			System.out.println("row listener");
@@ -179,10 +217,10 @@ public class OptionsTable extends JDialog {
 	class addColListener implements ActionListener {
 		public void actionPerformed(ActionEvent event) {
 			System.out.println("col listener");
-					((ALTableModel) table.getModel()).addColumn(colNameField.getText());
+			((ALTableModel) table.getModel()).addColumn(colNameField.getText());
 		}
 	}
-	
+
 	class deleteColListener implements ActionListener {
 		public void actionPerformed(ActionEvent event) {
 			System.out.println("delete column listener");
@@ -195,11 +233,34 @@ public class OptionsTable extends JDialog {
 		public void actionPerformed(ActionEvent event) {
 			System.out.println("Done listener");
 			setVisible(false);
-			for(int col = 0; col < table.getColumnCount();col++) {
-				for(int row = 0; row < table.getRowCount();row++) {
-					System.out.println(table.getValueAt(row, col));
+			try {
+				BufferedWriter output = new BufferedWriter(new FileWriter(defaultFile));
+				//we will transpose the options table for reading and writing: this makes for 
+				//easier reading and writing.
+				for(String s: colNames){
+					output.write(s + "\t");
+					IJ.log("writing colname: " + s);
 				}
-			}
+				output.newLine();
+				for(int row = 0; row < table.getRowCount();row++) {
+//					IJ.log("starting row: " + row + " of " + table.getRowCount() +"total\n" );
+					for(int col = 0; col < table.getColumnCount();col++) {
+//						IJ.log("starting col: " + col + " of " + table.getColumnCount() +"total\n" );
+						if (table.getValueAt(row,col) != null) {
+							output.write((String) table.getValueAt(row, col));
+						} 
+						output.write(("\t"));
+//						IJ.log("writing " + table.getValueAt(row, col));
+					}
+					output.newLine();
+				}
+//				IJ.log("about to close prefs file");
+				output.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				IJ.log("IO excepction writing file");
+				e.printStackTrace();
+			} 	
 			dispose();
 		}
 	}
@@ -211,7 +272,7 @@ public class OptionsTable extends JDialog {
 		}
 	}
 
-	
+
 	final class ALTableModel extends AbstractTableModel {
 		int rows;
 		ArrayList<String> colNames;
@@ -290,5 +351,5 @@ public class OptionsTable extends JDialog {
 			return String.class;
 		}
 	}
-	
+
 }
