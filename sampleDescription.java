@@ -34,6 +34,13 @@ public class sampleDescription {
 	private GenericDialog gd = new GenericDialog("Sample Description");
 	public Boolean saveRois;
 	private OptionsTable ot;
+	private String[] fieldNames;
+	private String[] description = new String[fieldNames.length];
+//private int[] defaultsIndex = {0,8,9}; //names of the fields that we want to save as defaults
+//private String[] defaults = new String[fieldNames.length];
+//private String filepath = "leaf_measure_defaults.txt";
+//private File defaultFile = new File(filepath);
+
 
 	sampleDescription() {
 		try {
@@ -82,6 +89,31 @@ public class sampleDescription {
 			ot.editTable();
 			gd = new GenericDialog("Sample Description");
 			getInput();
+		} else {
+			//get descriptions
+			//populate array with contents of dialog box
+			fieldNames = ot.getFieldNames();
+			
+			//below I should go through each field, determine length and then get choice or string, depending
+			
+			
+//			for (int i = 0; i < fieldNames.length; i++) {
+//				//ugly!!
+//				switch(i) {
+//				case 0:
+//				case 1:
+//				case 2:
+//				case 3: description[i] = gd.getNextChoice(); break;
+//				case 4:
+//				case 5:
+//				case 6:
+//				case 7:
+//				case 8:
+//				case 9: description[i] = gd.getNextString(); break;
+//				}
+//			}
+//			
+
 		}
 		
 		saveRois = gd.getNextBoolean();

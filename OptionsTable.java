@@ -75,6 +75,10 @@ public class OptionsTable extends JDialog {
 		return colNames.get(field);
 	}
 	
+	public String[] getFieldNames() {
+		return colNames.toArray(new String[0]);
+	}
+	
 	public String[] getFieldValues(int field) {
 		//need to trim null values out of the ArrayList before returning
 		ArrayList<String> returnValues = new ArrayList<String>();
