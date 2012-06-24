@@ -112,7 +112,6 @@ public class OptionsTable extends JDialog {
 			BufferedReader input = new BufferedReader(new FileReader(defaultFile));
 
 		//note that the defaults are stored in a transposed table...
-			int rows = 0;
 			while (true) { 
 				String line = input.readLine();
 				System.out.println(line);
