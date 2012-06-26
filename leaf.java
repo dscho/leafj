@@ -314,13 +314,15 @@ public class leaf {
 		ip.drawLine((int) topLine[0],(int) topLine[1],(int) topLine[2],(int) topLine[3]);
 		
 		//apply the wand
-		if (verbose > 1) IJ.log("wand settings.  x:" + 
-			IJ.d2s(leafCenter_x[top+10]) + 
-			" y:" + IJ.d2s((int) leafCenter_y[top+10]) +
+		if (verbose > 1) {
+			IJ.log("wand settings.  x:" + 
+			IJ.d2s(leafCenter_x[Math.min(top+10,leafCenter_x.length-1)]) + 
+			" y:" + IJ.d2s((int) leafCenter_y[Math.min(top+10,leafCenter_y.length-1)]) +
 			" min:" + IJ.d2s(ip.getMinThreshold()) +
 			" max:" + IJ.d2s(ip.getMaxThreshold()));
-		w.autoOutline((int) leafCenter_x[top+10],
-				(int) leafCenter_y[top+10],
+		}
+		w.autoOutline((int) leafCenter_x[Math.min(top+10,leafCenter_x.length-1)],
+				(int) leafCenter_y[Math.min(top+10,leafCenter_y.length-1)],
 				ip.getMinThreshold(),
 				ip.getMaxThreshold()*.9,
 				Wand.FOUR_CONNECTED);

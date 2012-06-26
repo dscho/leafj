@@ -122,7 +122,7 @@ public class widthArrayLeaf {
 		        //the idea is to not let abrupt changes at the beginning mess things up.
 		        //this ensures that the region below the current test area is relatively even.
 
-		        || widths[i + (int) Math.round(widths.length/5)] < 1.5*widths[i] )
+		        || widths[Math.min(widths.length-1, i + (int) Math.round(widths.length/5))] < 1.5*widths[i] )
 				// if we are at the junction then moving 20% up the leaf should be much wider than where we are.
 		{
 			if (verbose >1) {
