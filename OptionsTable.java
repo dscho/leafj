@@ -156,6 +156,7 @@ public class OptionsTable extends JDialog {
 		table.setShowVerticalLines(true);
 		table.setGridColor(Color.BLACK);
 		table.getColumnModel().setColumnSelectionAllowed(true);
+		table.getTableHeader().setReorderingAllowed(false);
 		table.setModel(new ALTableModel(rows, colNames, data));
 	}
 
