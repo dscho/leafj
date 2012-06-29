@@ -74,6 +74,7 @@ public class pixelRowLeaf {
 		int start;
 		int end;
 		int width = 0;
+		if (getMin(pixels) > threshold) return(new int[] {0,0}); //no object in scan line
 		if (center < 0) {	//this means that we are looking at the bottom
 					//and need to find the hypocotyl center
 			//find center
@@ -115,6 +116,7 @@ public class pixelRowLeaf {
 			int originalCenter = center;
 			int step = 1;
 			
+			//make sure we are somewhere on the leaf/petiole:
 			while ((center > 0) && (center < pixels.length) && pixels[center] > threshold) {
 				center = originalCenter + step;
 				step = step*-1;
@@ -125,7 +127,7 @@ public class pixelRowLeaf {
 			start = center;
 			end = center;
 			if (verbose > 1) IJ.log("looking for start");
-			while (start > 0 && pixels[start-1] < threshold) { 
+			while (start > 0 && start < pixels.length && pixels[start-1] < threshold) { 
 				start--;  				// start is still on the object
 									// work left until end is found
 				if (verbose > 1) {
@@ -135,7 +137,7 @@ public class pixelRowLeaf {
 				} // if verbose
 			}//while start
 			if (verbose > 1) IJ.log("looking for end");
-			while (pixels[end+1] < threshold && end+2 < pixels.length) {
+			while (end+2 < pixels.length && pixels[end+1] < threshold) {
 				end++;	//work right until end is no longer on object
 				if (verbose > 1) {
 					width = end - start;			
@@ -174,6 +176,15 @@ public class pixelRowLeaf {
 		
 	public int getBG() {
 		return (int) bg;
+	}
+	
+	private double getMin(double[] a) {
+		double min = a[0];
+		for (int i = 1; i < a.length; i++) {
+			if (a[i] < min)
+				min = a[i];
+		}
+		return min;
 	}
 
 }//class

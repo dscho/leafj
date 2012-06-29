@@ -13,7 +13,7 @@ public class widthArrayLeaf {
 	//but the associated methods.
 
 	//current implementation has the diff[0] = to the bottom of the leaf.
-	public int verbose = 0; //mostly not implemented yet
+	public int verbose = 2; //mostly not implemented yet
 	private double[][] positions;		//array of x1, y1, x2, y2 positions
 	//first dimension is scan #
 	//second position is x1, y1, x2, y2
@@ -85,7 +85,7 @@ public class widthArrayLeaf {
 
 
 	public void findTop(){
-		//rewriten to start from bottom and work up
+		//rewritten to start from bottom and work up
 
 		//method to determine valid endpoints for the top of the petiole
 		//scan up the array of widths until the difference exceeds a threshold
@@ -122,15 +122,32 @@ public class widthArrayLeaf {
 		        //the idea is to not let abrupt changes at the beginning mess things up.
 		        //this ensures that the region below the current test area is relatively even.
 
-		        || widths[Math.min(widths.length-1, i + (int) Math.round(widths.length/5))] < 1.5*widths[i] )
+		        || (
+		        		(widths[Math.min(widths.length-1, i + (int) Math.round(widths.length/5))] < 1.5*widths[i] ) &&
+		        		i + widths.length/5 <= widths.length //long petioles and leafs placed at an angle necessitate this; will fire if query point is near end of leaf
+		        		)
+		        		)
 				// if we are at the junction then moving 20% up the leaf should be much wider than where we are.
 		{
 			if (verbose >1) {
 				IJ.log("i: " + IJ.d2s(i,0) + " diff[i]: " + IJ.d2s(diff[i]) + " diff[i+runningWindow]" +
-				       IJ.d2s(diff[i+runningWindow]) + " getMax(diff,i,i-runningWindow): " + IJ.d2s(getMax(diff,i,i-runningWindow))
-				       + " widths[i]: " + IJ.d2s(widths[i]));
-				IJ.log(" width at: " + IJ.d2s(i + (int) Math.round(widths.length/5)) + " is " +
-				       IJ.d2s(widths[i + (int) Math.round(widths.length/5)]));
+						IJ.d2s(diff[i+runningWindow]) + " getMax(diff,i,i-runningWindow): " + IJ.d2s(getMax(diff,i,i-runningWindow))
+						+ " widths[i]: " + IJ.d2s(widths[i]));
+				if ((i + (int) Math.round(widths.length/5)) < widths.length) { 
+					IJ.log(" width at: " + IJ.d2s(i + (int) Math.round(widths.length/5)) + " is " +
+							IJ.d2s(widths[i + (int) Math.round(widths.length/5)]));
+				} else {
+					IJ.log("out of bounds");
+				}
+				IJ.log("diff[i] == 0 " + (diff[i] == 0));
+				IJ.log("widths[i] < widthThreshold " + (widths[i] < widthThreshold));
+				IJ.log("getMax(diff,i-runningWindow,i) > windowThreshold " + (getMax(diff,i-runningWindow,i) > windowThreshold));
+				IJ.log("(widths[Math.min(widths.length-1, i + (int) Math.round(widths.length/5))] < 1.5*widths[i] )" +
+						((widths[Math.min(widths.length-1, i + (int) Math.round(widths.length/5))] < 1.5*widths[i] )));
+				IJ.log("i + widths.length/5 <= widths.length" + (i + widths.length/5 <= widths.length));
+				IJ.log("and of the last two: " + ((widths[Math.min(widths.length-1, i + (int) Math.round(widths.length/5))] < 1.5*widths[i] ) &&
+		        		i + widths.length/5 <= widths.length ));
+				
 			} //verbose
 			i++;
 			if ((i+runningWindow) >= widths.length-1) break; //should be an exception here
@@ -146,7 +163,7 @@ public class widthArrayLeaf {
 			//changed to get rid of conversion to absolute number.
 			//the leaf should be increasing in width at the petiole end.
 			diff[i] = (mean(widths,i,i+runningWindow) - mean(widths,i-runningWindow,i));
-			if (verbose > 1) IJ.log(IJ.d2s(i) + "  " + IJ.d2s(diff[i]));
+			if (verbose > 1) IJ.log("i:" + IJ.d2s(i) + " width:" + IJ.d2s(widths[i]) + " diff:" + IJ.d2s(diff[i]));
 		}
 		setThresholds();
 		diffCalc = true;
@@ -202,7 +219,7 @@ public class widthArrayLeaf {
 		return bottom;
 	}
 
-	private float getMax(float[] array,int start,int end) { //return maximum value in an int[]
+	private float getMax(float[] array,int start,int end) { //return maximum value in a float[]
 		float max = array[start];
 		for (int i = start; i < end; i++) {
 			if (array[i] > max)

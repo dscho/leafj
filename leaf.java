@@ -12,7 +12,7 @@ import ij.plugin.frame.*;
 
 
 public class leaf {
-	public int verbose = 0;
+	public int verbose = 4;
 	private int top;		//petiole top.  Should probably change name
 	private int bottom;		//petiole bottom.
 	private int width;		//width of leaf ROI
@@ -43,6 +43,8 @@ public class leaf {
 	private float[] petiole_x;
 	private float[] petiole_y;
 		//will hold center positions of petiole only
+	
+	int arrayLength;
 		
 	private widthArrayLeaf widths;
 	
@@ -59,14 +61,18 @@ public class leaf {
 		angle = rt.getValue("Angle",row);
 		//Note: Angle of 0 = "3 O'clock"
 		A = Math.toRadians(angle); //Angle of leaf from horizontal
-		leafCenter_x = new float[Math.max(width,height)];
-		leafCenter_y = new float[Math.max(width,height)];
 		wide = (angle < 45 || angle > 135); //true if leaf is more horizontally oriented
 		right = (angle < 90); //true if leaf is leaning to right
-		widths = new widthArrayLeaf((int) Math.max(width,height));
-			// since the stepsize will be 1 along the long axis of the leaf
-			// we set the size of the width array to be equal to the
-			// long axis of the boundary box.
+		if (wide) {
+			arrayLength = (int) (width + Math.abs(Math.tan(A)*height));
+			if (verbose > 0) IJ.log("wide: widths array extent = " + IJ.d2s(width + Math.abs(Math.tan(A)*height)));
+		} else {
+			arrayLength = (int) (height + Math.abs(width/Math.tan(A)));
+			if (verbose > 0) IJ.log("tall: widths array extent = " + IJ.d2s(height + Math.abs(width/Math.tan(A))));
+		}
+		widths = new widthArrayLeaf(arrayLength);
+		leafCenter_x = new float[arrayLength];
+		leafCenter_y = new float[arrayLength];
 		if (verbose > 0) {
 			IJ.log("setHyp. ROI_left: "+
 			IJ.d2s(ROI_left) + " ROI_top: " +
@@ -117,33 +123,56 @@ public class leaf {
 		
 		int[] widthCenter = {0, -1};	 //see below.  to hold results of getWidth
 		if (right) {//leaf leaning to right; scan from left to right
-			for(xscan = ROI_left+1; xscan <= ROI_right; xscan++){
-			//set x1, y1, and x2, y2, according to current x position
-				x1 = ROI_left;
-				y1 = ROI_bottom - (xscan-ROI_left)/Math.tan(A);
-				x2 = xscan;
-				y2 = ROI_bottom;
+//			for(xscan = ROI_left+1; xscan <= ROI_right; xscan++){
+			x1 = x2 = ROI_left;
+			y1 = y2 = ROI_bottom; 
+
+			while(x2 < ROI_right  && i < arrayLength) {
+				if (verbose > 1) IJ.log("first while, x2: " + IJ.d2s(x2));
+				x2++;
+				y1 = ROI_bottom - (x2-ROI_left)/Math.tan(A);
 				if (y1 < ROI_top) { // outside of ROI!
 					y1 = ROI_top;
 					x1 = x2 - height*Math.tan(A);
 				} //if y1 < ROI_top
 				widthCenter = processScanLine(x1, y1, x2, y2, i, ip, widthCenter);
 				i++;
-			} //for xscan
+			} //while x2
+			while (x1 < ROI_right && y2 > ROI_top &&i < arrayLength) {
+				if (verbose > 1) IJ.log("second while: x1, y2: " + IJ.d2s(x1) + " " + IJ.d2s(y2));
+				//x1 and y2 need to advance
+				x1++;
+				y2 = ROI_top + (ROI_right-x1)/Math.tan(A);
+				widthCenter = processScanLine(x1, y1, x2, y2, i, ip, widthCenter);
+				i++;		
+			} //while x1
 		}  else { //leaf leaning to the left
-			for(xscan = ROI_right-1; xscan >= ROI_left; xscan--){
+	//		for(xscan = ROI_right-1; xscan >= ROI_left; xscan--){
+			x1 = x2 = ROI_right;
+			y1 = y2 = ROI_bottom;
+			while (x2 >= ROI_left && i < arrayLength){
 				//x1, y1 are now to the right of the leaf
-				x1 = ROI_right;
-				y1 = ROI_bottom + (ROI_right-xscan)/Math.tan(A); //Math.tan(A) will be negative
-				x2 = xscan;
-				y2 = ROI_bottom;
+				//start at bottom right
+				//x2 moves left, y2 stays at the bottom
+				//y1 moves up
+				x2--;
+				y1 = ROI_bottom + (ROI_right-x2)/Math.tan(A); //Math.tan(A) will be negative
 				if (y1 < ROI_top) { //outside of ROI!
+					//once y1 has moved to top, the x1 starts moving left
 					y1 = ROI_top;
 					x1 = x2 - height*Math.tan(A);//note tan(A) will be negative.
 				} //y1 < ROI_left
 				widthCenter = processScanLine(x1, y1, x2, y2, i, ip, widthCenter);
 				i++;
-			}//for xscan
+			}//while x2
+			while (x1 >= ROI_left && y2 > ROI_top && i < arrayLength) {
+				//now x2,y2 should be at bottom left
+				//x1 will move left, y2 should move up
+				x1--;
+				y2 = ROI_top - (x1-ROI_left)/Math.tan(A);
+				widthCenter = processScanLine(x1, y1, x2, y2, i, ip, widthCenter);
+				i++;
+			} //while x1
 		} // else	
 	}//scanWide
 	
@@ -221,7 +250,7 @@ public class leaf {
 				"yC: " + IJ.d2s(yC));
 		}
 		
-		if (verbose > 2) ip.drawPixel((int) xC, (int) yC); 
+		//if (verbose > 2) ip.drawPixel((int) xC, (int) yC); 
 		
 		if ((i % 5 == 0) & (verbose > 3)) {
 			ip.drawLine((int) x1, (int) y1, (int) x2, (int) y2);
