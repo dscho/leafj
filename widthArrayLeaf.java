@@ -13,7 +13,7 @@ public class widthArrayLeaf {
 	//but the associated methods.
 
 	//current implementation has the diff[0] = to the bottom of the leaf.
-	public int verbose = 2; //mostly not implemented yet
+	public int verbose = 0; //mostly not implemented yet
 	private double[][] positions;		//array of x1, y1, x2, y2 positions
 	//first dimension is scan #
 	//second position is x1, y1, x2, y2

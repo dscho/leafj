@@ -12,7 +12,7 @@ import ij.plugin.frame.*;
 
 
 public class leaf {
-	public int verbose = 4;
+	public int verbose = 0;
 	private int top;		//petiole top.  Should probably change name
 	private int bottom;		//petiole bottom.
 	private int width;		//width of leaf ROI
@@ -112,7 +112,6 @@ public class leaf {
 	} //scanLeaf
 	
 	private void scanWide(ImageProcessor ip) {
-		//need to adjust below so that it keeps scanning until both x1 and x2 are at ROI
 		//scan along the leaf, one row at a time.
 		double x1, x2, y1, y2,xscan;
 		x1 = y1 = x2 = y2 = -1;
@@ -177,44 +176,49 @@ public class leaf {
 	}//scanWide
 	
 	private void scanTall(ImageProcessor ip) {
-		//need to adjust below so that it keeps scanning until both y1 and y2 are at ROI
 		//scan along the leaf, one row at a time.
 		//Will use some trig to calculate a line for scanning along leaf
 		//x1,y1 and x2,y2 are start and end points of scan line
 
-		double x1, x2, y1, y2,yscan;
+		double x1, x2, y1, y2;
 			
 		int i = 0; //0 will represent bottom of leaf
 		
 		int[] widthCenter = {0, -1};	 //see below.  to hold results of getWidth
-		for(yscan = ROI_bottom-1; yscan >= ROI_top; yscan--){
-			
+		y1 = y2 = ROI_bottom;
+		if (right) x1 = x2 = ROI_left; else x1 = x2 = ROI_right;
+		while(y1 > ROI_top && i < arrayLength) {	
 			//set x1, y1, and x2, y2, according to current y position
-			
+			y1--; //step up
 			if (right) { //leaf leaning to the right
-				x1 = ROI_left;
-				y1 = yscan;
-				x2 = ((ROI_bottom - yscan) * Math.tan(A)) + ROI_left;
-				y2 = ROI_bottom-1;
+				x2 = ((ROI_bottom - y1) * Math.tan(A)) + ROI_left;
 				if (x2 > ROI_right) { // outside of ROI!
 					x2 = ROI_right;
 					y2 = y1 + width/Math.tan(A);
 				}
 			}  else { //leaf leaning to the left
-				x1 = ROI_right;
-				y1 = yscan; //x1, y1 are now to the right of the leaf
-				x2 = ROI_right + ((ROI_bottom - yscan) * Math.tan(A));
+				x2 = ROI_right + ((ROI_bottom - y1) * Math.tan(A));
 					//the tangent will be negative so we add here
-				y2 = ROI_bottom;
 				if (x2 < ROI_left) { //outside of ROI!
 					x2 = ROI_left;
 					y2 = y1 - width/Math.tan(A);
 				}
-			} // else
-			
+			} // else			
 			widthCenter = processScanLine(x1, y1, x2, y2, i, ip, widthCenter);
 			i++;
-		}//for
+		}//while y1
+		while(y2 > ROI_top && i < arrayLength) {
+			//x1,y1 are now at top corner
+			//need to bring x2, y2 along to their top corner
+			y2--; //step up
+			if (right) {
+				x1 = ROI_right - Math.abs(Math.tan(A))*(y2-ROI_top);
+			} else {
+				x1 = ROI_left + Math.abs(Math.tan(A))*(y2-ROI_top);
+			} //else
+			widthCenter = processScanLine(x1, y1, x2, y2, i, ip, widthCenter);
+			i++;
+		}//while y2
 	}//scanTall
 	
 	private int[] processScanLine(double x1, double y1, double x2, double y2, int i, ImageProcessor ip, int[] widthCenter) {
@@ -355,11 +359,12 @@ public class leaf {
 				ip.getMinThreshold(),
 				ip.getMaxThreshold()*.9,
 				Wand.FOUR_CONNECTED);
-		PolygonRoi bladeROI = new PolygonRoi(w.xpoints,w.ypoints,w.npoints,Roi.POLYGON);
-		rm.add(imp,bladeROI,leaf);//need to change leaf number handling
-		rm.select(leaf*2+1);
-		rm.runCommand("Rename", String.valueOf(leaf*2 + 2) + ": Blade " + String.valueOf(leaf+1));
-		if (verbose > 0) IJ.log("end find blade");
+		if (w.npoints > 0) {
+			PolygonRoi bladeROI = new PolygonRoi(w.xpoints,w.ypoints,w.npoints,Roi.POLYGON);
+			rm.add(imp,bladeROI,leaf);//need to change leaf number handling
+			rm.select(leaf*2+1);
+			rm.runCommand("Rename", String.valueOf(leaf*2 + 2) + ": Blade " + String.valueOf(leaf+1));
+		}if (verbose > 0) IJ.log("end find blade");
 	}
 		
 public void addPetioleToManager(ImagePlus imp, ImageProcessor ip, RoiManager rm,int leaf){
