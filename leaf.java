@@ -229,7 +229,7 @@ public class leaf {
 		row.setThreshold(ip.getMaxThreshold());
 		row.setPixels(ip,x1,y1,x2,y2);
 		double[] tmp = {x1,y1,x2,y2};
-		double xC,yC; 		//petiole center at each scan line
+		double xC,yC; 		//leaf center at each scan line
 		widthCenter = row.getWidth(widthCenter[1]);
 		widths.setWidth(tmp,widthCenter[0],i);
 		

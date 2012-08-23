@@ -74,7 +74,7 @@ public class pixelRowLeaf {
 		int start;
 		int end;
 		int width = 0;
-		if (getMin(pixels) > threshold) return(new int[] {0,0}); //no object in scan line
+		if (getMin(pixels) > threshold) return(new int[] {0,-1}); //no object in scan line
 		if (center < 0) {	//this means that we are looking at the bottom
 					//and need to find the hypocotyl center
 			//find center
