@@ -59,7 +59,7 @@ public class LeafJ_ implements PlugInFilter {
 			rm.runCommand("Delete");
 		}
 			
-		double minParticleSize = 2000;
+		double minParticleSize = 4000;
 		
 		ParticleAnalyzer pa = new ParticleAnalyzer(ParticleAnalyzer.SHOW_NONE
 			//+ParticleAnalyzer.SHOW_RESULTS
